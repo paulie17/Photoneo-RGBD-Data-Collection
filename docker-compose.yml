@@ -1,0 +1,32 @@
+version: '2.4'
+services:
+  automatic_data_collection:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: automatic_data_collection
+    network_mode: "host"
+    runtime: "nvidia"
+    image: "automatic_phoxi_data_collection"
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /dev/ximc/000042A6:/dev/ximc/000042A6
+      - ./Development/data:/root/data
+      - /var/run:/var/run
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/dbus:/var/run/dbus
+      - /dev/shm:/dev/shm
+    environment:
+      - DISPLAY
+      - TERM
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_INDIRECT=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+    privileged: true
+    stdin_open: true
+    tty: true
+    security_opt:
+      - apparmor=unconfined
