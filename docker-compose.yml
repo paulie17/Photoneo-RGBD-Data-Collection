@@ -1,13 +1,13 @@
 version: '2.4'
 services:
-  automatic_data_collection:
+  phoxi_data_collection:
     build:
       context: .
       dockerfile: Dockerfile
-      target: automatic_data_collection
+      target: phoxi_data_collection
     network_mode: "host"
     runtime: "nvidia"
-    image: "automatic_phoxi_data_collection"
+    image: "phoxi_data_collection"
     devices:
       - /dev/dri:/dev/dri
     volumes:

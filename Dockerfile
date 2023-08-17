@@ -1,4 +1,4 @@
-FROM phoxi_docker as automatic_data_collection
+FROM phoxi_docker as phoxi_data_collection
 
 COPY Development/ueye/ /ueye
 RUN ./ueye/ueye_4.95.0.1134_amd64.run --auto
