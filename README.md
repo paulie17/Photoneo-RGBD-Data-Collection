@@ -36,7 +36,7 @@ Tested on Ubuntu 20.04 with NVIDIA driver version 530 using a Photoneo MotionCam
     to make sure the GUI of PhoXiControl can be visualized when running it from a docker container.
 - Run, in the same directory
   
-        $ docker compose run phoxi_docker
+        $ docker compose run phoxi_data_collection
 
     to create and run a container from the phoxi_data_collection image.
 - Run, when the container is running:
