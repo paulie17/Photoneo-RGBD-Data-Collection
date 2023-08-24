@@ -23,6 +23,7 @@ The application can be executed in two modalities:
 Tested on Ubuntu 20.04 with NVIDIA driver version 530 using a Photoneo MotionCam-3D.
 
 ## Instructions
+- Place the ueye driver installer file ueye_4.95.0.1134_amd64.run in the folder Development/ueye/ .
 - Make sure to have already built the docker image phoxi_docker from the phoxi_docker repo. The Dockerfile in this repo builds on top of phoxi_docker.
 - Run, in the same directory  as the Dockerfile and docker-compose.yml.
 
