@@ -23,11 +23,10 @@ namespace externalCamera {
  * @param PhoXiDevice the current phoxidevice in use
  */
 
-pho::api::Mat2D<pho::api::ColorRGB_32f> colorPointCloudTexture(
+pho::api::Mat2D<pho::api::ColorRGB_16> colorPointCloudTexture(
             pho::api::PFrame frame,
             cv::Mat extCameraImage,
-            const pho::api::AdditionalCameraCalibration& calibration,
-            const pho::api::PPhoXi& PhoXiDevice);
+            const pho::api::AdditionalCameraCalibration& calibration);
 /**
  * Save the color Point Cloud as a .ply file
  *

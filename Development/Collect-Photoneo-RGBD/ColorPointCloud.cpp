@@ -3,11 +3,11 @@
 
 namespace externalCamera {
 
-    pho::api::Mat2D<pho::api::ColorRGB_32f> colorPointCloudTexture(
+    pho::api::Mat2D<pho::api::ColorRGB_16> colorPointCloudTexture(
             pho::api::PFrame frame,
             cv::Mat extCameraImage,
-            const pho::api::AdditionalCameraCalibration& calibration,
-            const pho::api::PPhoXi& PhoXiDevice) {
+            const pho::api::AdditionalCameraCalibration& calibration
+            ) {
         std::cout << "The alignment of color texture to the point cloud is in progress..." << std::endl;
         
         auto TextureSize = frame->GetResolution();
@@ -122,7 +122,7 @@ namespace externalCamera {
             }
         }
 
-        pho::api::Mat2D<pho::api::ColorRGB_32f> textureRGB(TextureSize);
+        pho::api::Mat2D<pho::api::ColorRGB_16> textureRGB(TextureSize);
         ConvertOpenCVMatToMat2D(cvTextureRGB, textureRGB);
         return textureRGB;
     }

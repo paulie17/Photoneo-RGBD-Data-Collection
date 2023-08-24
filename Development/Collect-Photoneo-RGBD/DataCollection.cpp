@@ -44,59 +44,94 @@ namespace externalCamera {
                 cv::cvtColor(bw,bw,cv::COLOR_GRAY2RGB);
                 cv::aruco::drawAxis(bw, cameraMatrix, distCoeffsMat, rvec, tvec, 0.1f);
 
-                // Extract rotation matrix from the rotation vector
-                cv::Mat rotationMatrix;
-                cv::Rodrigues(rvec, rotationMatrix);
+                // // Extract rotation matrix from the rotation vector
+                // cv::Mat rotationMatrix;
+                // cv::Rodrigues(rvec, rotationMatrix);
 
-                // Create a 4x4 transformation matrix [R | t; 0 0 0 1]
-                cv::Mat transformationMatrix(4, 4, CV_32F);
-                cv::Mat translationVector = cv::Mat::zeros(3, 1, CV_32F);
-                for (int i = 0; i < 3; ++i) {
-                    translationVector.at<float>(i,0) = tvec[i];
-                }                 
-                // Extract translation vector
+                // // Create a 4x4 transformation matrix [R | t; 0 0 0 1]
+                // cv::Mat transformationMatrix(4, 4, CV_32F);
+                // cv::Mat translationVector = cv::Mat::zeros(3, 1, CV_32F);
+                // for (int i = 0; i < 3; ++i) {
+                //     translationVector.at<float>(i,0) = tvec[i];
+                // }                 
+                // // Extract translation vector
 
-                // Compose the transformation matrix
-                cv::Mat upperLeft = transformationMatrix(cv::Rect(0, 0, 3, 3));
-                rotationMatrix.copyTo(upperLeft);
-                translationVector.copyTo(transformationMatrix(cv::Rect(3, 0, 1, 3)));
+                // // Compose the transformation matrix
+                // cv::Mat upperLeft = transformationMatrix(cv::Rect(0, 0, 3, 3));
+                // rotationMatrix.copyTo(upperLeft);
+                // translationVector.copyTo(transformationMatrix(cv::Rect(3, 0, 1, 3)));
 
-                // Add the [0, 0, 0, 1] row to complete the transformation matrix
-                transformationMatrix.at<float>(3, 3) = 1.0f;
+                // // Add the [0, 0, 0, 1] row to complete the transformation matrix
+                // transformationMatrix.at<float>(3, 3) = 1.0f;
 
-                // Invert the transformation matrix
-                cv::Mat invertedTransformationMatrix = transformationMatrix.inv();
+                // // Invert the transformation matrix
+                // cv::Mat invertedTransformationMatrix = transformationMatrix.inv();
 
-                // Extract inverted translation vector and quaternion from the inverted matrix
+                // // Extract inverted translation vector and quaternion from the inverted matrix
 
-                // Extract the inverted translation vector
-                cv::Mat invertedTranslationVector_mat = invertedTransformationMatrix(cv::Rect(3, 0, 1, 3));
-                cv::Vec3d invertedTranslationVector_vec(invertedTranslationVector_mat);
+                // // Extract the inverted translation vector
+                // cv::Mat invertedTranslationVector_mat = invertedTransformationMatrix(cv::Rect(3, 0, 1, 3));
+                // cv::Vec3d invertedTranslationVector_vec(invertedTranslationVector_mat);
 
-                // Extract the inverted rotation matrix from the upper-left 3x3 block
-                cv::Mat invertedRotationMatrix = invertedTransformationMatrix(cv::Rect(0, 0, 3, 3));
+                // // Extract the inverted rotation matrix from the upper-left 3x3 block
+                // cv::Mat invertedRotationMatrix = invertedTransformationMatrix(cv::Rect(0, 0, 3, 3));
 
-                // Convert the inverted rotation matrix to an Eigen matrix for quaternion conversion
-                Eigen::Matrix3d invertedEigenRotationMatrix;
-                cv::cv2eigen(invertedRotationMatrix, invertedEigenRotationMatrix);
+                // // Convert the inverted rotation matrix to an Eigen matrix for quaternion conversion
+                // Eigen::Matrix3d invertedEigenRotationMatrix;
+                // cv::cv2eigen(invertedRotationMatrix, invertedEigenRotationMatrix);
                 
-                // Compute the inverted quaternion
-                Eigen::Quaterniond invertedQuaternion = Eigen::Quaterniond(invertedEigenRotationMatrix);
+                // // Compute the inverted quaternion
+                // Eigen::Quaterniond invertedQuaternion = Eigen::Quaterniond(invertedEigenRotationMatrix);
+
+                // YAML::Emitter emitter;
+                // emitter << YAML::Key << YAML::BeginMap;
+                // emitter << YAML::Key << posecount << YAML::Value << YAML::BeginMap;
+                // emitter << YAML::Key << "camera_to_world" << YAML::Value << YAML::BeginMap;
+                // emitter << YAML::Key << "quaternion" << YAML::Value << YAML::BeginMap;
+                // emitter << YAML::Key << "w" << YAML::Value << invertedQuaternion.w();
+                // emitter << YAML::Key << "x" << YAML::Value << invertedQuaternion.x();
+                // emitter << YAML::Key << "y" << YAML::Value << invertedQuaternion.y();
+                // emitter << YAML::Key << "z" << YAML::Value << invertedQuaternion.z();
+                // emitter << YAML::EndMap;
+                // emitter << YAML::Key << "translation" << YAML::Value << YAML::BeginMap;
+                // emitter << YAML::Key << "x" << YAML::Value << invertedTranslationVector_vec[0];
+                // emitter << YAML::Key << "y" << YAML::Value << invertedTranslationVector_vec[1];
+                // emitter << YAML::Key << "z" << YAML::Value << invertedTranslationVector_vec[2];
+                // emitter << YAML::EndMap;
+
+                //pose manipulation
+                cv::Mat R;
+                cv::Rodrigues(rvec, R);
+                Eigen::Matrix3d mat;
+                cv::Mat M(3,4, CV_32F);
+                cv::Mat add = (cv::Mat_<double>(1,4) << 0, 0, 0, 1);
+                cv::hconcat(R, tvec, M);
+                cv::Mat M4(4,4, CV_32F),M4inv(4,4, CV_32F);
+                cv::vconcat(M,add,M4);
+                M4inv = M4.inv();
+                cv::Mat rvecinv,tvecinv;
+                tvecinv = M4inv(cv::Range(0,3),cv::Range(3,4));
+                cv::Vec3d TVECINV(tvecinv);
+                rvecinv = M4inv(cv::Range(0,3), cv::Range(0,3));
+                cv2eigen(rvecinv, mat);
+                Eigen::Quaterniond EigenQuat(mat);
+                Eigen::Quaterniond quatinv;
+                quatinv = EigenQuat;
 
                 YAML::Emitter emitter;
                 emitter << YAML::Key << YAML::BeginMap;
                 emitter << YAML::Key << posecount << YAML::Value << YAML::BeginMap;
                 emitter << YAML::Key << "camera_to_world" << YAML::Value << YAML::BeginMap;
                 emitter << YAML::Key << "quaternion" << YAML::Value << YAML::BeginMap;
-                emitter << YAML::Key << "w" << YAML::Value << invertedQuaternion.w();
-                emitter << YAML::Key << "x" << YAML::Value << invertedQuaternion.x();
-                emitter << YAML::Key << "y" << YAML::Value << invertedQuaternion.y();
-                emitter << YAML::Key << "z" << YAML::Value << invertedQuaternion.z();
+                emitter << YAML::Key << "w" << YAML::Value << quatinv.w();
+                emitter << YAML::Key << "x" << YAML::Value << quatinv.x();
+                emitter << YAML::Key << "y" << YAML::Value << quatinv.y();
+                emitter << YAML::Key << "z" << YAML::Value << quatinv.z();
                 emitter << YAML::EndMap;
                 emitter << YAML::Key << "translation" << YAML::Value << YAML::BeginMap;
-                emitter << YAML::Key << "x" << YAML::Value << invertedTranslationVector_vec[0];
-                emitter << YAML::Key << "y" << YAML::Value << invertedTranslationVector_vec[1];
-                emitter << YAML::Key << "z" << YAML::Value << invertedTranslationVector_vec[2];
+                emitter << YAML::Key << "x" << YAML::Value << TVECINV[0];
+                emitter << YAML::Key << "y" << YAML::Value << TVECINV[1];
+                emitter << YAML::Key << "z" << YAML::Value << TVECINV[2];
                 emitter << YAML::EndMap;
 
                 ofstream myfile;
@@ -148,8 +183,12 @@ namespace externalCamera {
         ConvertMat2DToOpenCVMat(frame->TextureRGB, color);
         cv::cvtColor( color, color, cv::COLOR_RGB2BGR );
 
+        cv::Mat image8;
+
+        color.convertTo(image8, CV_8U);
+
         sprintf(filenamergb, "%s/rgb/%06d.png", currentScenePath.c_str(), posecount);
-        cv::imwrite(filenamergb, color);
+        cv::imwrite(filenamergb, image8);
 
     }
 
@@ -219,7 +258,7 @@ namespace externalCamera {
             auto extImage = extCamera.getColorImage();
 
             // Add the calculated color texture
-            frame->TextureRGB = colorPointCloudTexture(frame, extImage, calibration, device);
+            frame->TextureRGB = colorPointCloudTexture(frame, extImage, calibration);
 
             cv::Mat bw_texture;
 
@@ -341,7 +380,7 @@ namespace externalCamera {
             auto extImage = extCamera.getColorImage();
 
             // Add the calculated color texture
-            frame->TextureRGB = colorPointCloudTexture(frame, extImage, calibration, device);
+            frame->TextureRGB = colorPointCloudTexture(frame, extImage, calibration);
 
             cv::Mat bw_texture;
 

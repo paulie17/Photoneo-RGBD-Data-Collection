@@ -6,7 +6,7 @@ import libximc as ximc
 def rotate_table(degrees_to_rotate, return_to_zero=False):
     # Inser correct device URI if different
 
-    device_uri = "xi-com:///dev/ximc/000042A6"  # Serial port
+    device_uri = "xi-com:///dev/ttyACM0"  # Serial port
 
     device_id = ximc.lib.open_device(device_uri.encode())
     if device_id > 0:
